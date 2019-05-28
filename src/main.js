@@ -16,17 +16,11 @@ Path to the 7z command line tool. A typical installation on Windows might be fou
 */
 const sevenZipExe = "7z";
 
-/*
-To use the exhentai, authentication cookies are required.
-You can typically find this cookie string by opening a browser which
-is authenticated, opening the developer tools (shortcut key: F12),
-switching to the "Console" tab, and entering:
-	console.log(document.cookie);
-
-For example, a valid setup may look something like this:
-	const exCookieString = "ipb_member_id=XXXXXXX; ipb_pass_hash=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX; igneous=XXXXXXXXX";
-*/
-const exCookieString = null;
+let exCookieString = null;
+try {
+	exCookieString = fs.readFileSync(path.resolve(__dirname, "cookies.txt"), { encoding: "utf8" }).trim();
+	if (!exCookieString) { exCookieString = null; }
+} catch (e) {}
 
 
 function getIndexOfMatch(array, regex, start) {
@@ -208,7 +202,7 @@ async function addMetadata(archiveFileName) {
 		galleryInfo = getGalleryInfoFromUrl(galleryUrl);
 		if (galleryInfo !== null) { break; }
 	}
-	if (galleryInfo === 0) {
+	if (galleryInfo === null) {
 		throw new Error("No results");
 	}
 
