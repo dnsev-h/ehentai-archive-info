@@ -171,7 +171,9 @@ async function searchForImage(imageSource, site, jar) {
 	const hash = crypto.createHash("sha1").update(imageSource).digest("hex");
 
 	const urls = [
+		`https://${site}/?f_shash=${hash}&fs_similar=0&fs_exp=0&fs_covers=1&f_cats=0`,
 		`https://${site}/?f_shash=${hash}&fs_similar=0&fs_exp=1&fs_covers=1&f_cats=0`,
+		`https://${site}/?f_shash=${hash}&fs_similar=0&fs_exp=0&fs_covers=0&f_cats=0`,
 		`https://${site}/?f_shash=${hash}&fs_similar=0&fs_exp=1&fs_covers=0&f_cats=0`
 	];
 
