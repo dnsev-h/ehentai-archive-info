@@ -166,7 +166,7 @@ async function searchForImage(imageSource, site, jar) {
 		const data = await httpsGetAsync(url, jar);
 		if (isSadpanda(data.response)) { return []; }
 
-		const results = getSearchResults(data.body);
+		const results = getSearchResults(data.body.toString("utf8"));
 		if (results.length > 0) { return results; }
 	}
 
