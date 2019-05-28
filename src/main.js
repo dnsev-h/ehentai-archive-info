@@ -10,18 +10,28 @@ const GalleryIdentifier = require("./api/gallery-identifier").GalleryIdentifier;
 const getFromJson = require("./api/gallery-info/get-from-json");
 const commonJson = require("./api/gallery-info/common-json");
 
-/*
-Path to the 7z command line tool. A typical installation on Windows might be found at:
-	"C:\Program Files\7-Zip\7z"
-*/
-const sevenZipExe = "7z";
+const sevenZipExes = [
+	"7z",
+	"C:\\Program Files\\7-Zip\\7z.exe",
+	"C:\\Program Files (x86)\\7-Zip\\7z.exe",
+	// Add another entry here if 7z is installed somewhere else
+];
 
 let exCookieString = null;
 try {
-	exCookieString = fs.readFileSync(path.resolve(__dirname, "cookies.txt"), { encoding: "utf8" }).trim();
+	exCookieString = fs.readFileSync(path.resolve(__dirname, "../cookies.txt"), { encoding: "utf8" }).trim();
 	if (!exCookieString) { exCookieString = null; }
 } catch (e) {}
 
+
+function trySpawnSync(executables, args, options) {
+	let result = null;
+	for (const exe of executables) {
+		result = cp.spawnSync(exe, args, options);
+		if (!result.error) { break; }
+	}
+	return result;
+}
 
 function getIndexOfMatch(array, regex, start) {
 	for (let i = start; i < array.length; ++i) {
@@ -31,7 +41,8 @@ function getIndexOfMatch(array, regex, start) {
 }
 
 function getFiles(archiveFileName) {
-	const result = cp.spawnSync(sevenZipExe, [ "l", archiveFileName ], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "l", archiveFileName ], { stdio: "pipe" });
+	if (result.error) { throw result.error; }
 	if (result.status !== 0) { return []; }
 
 	const stdout = result.stdout.toString("utf8");
@@ -58,7 +69,8 @@ function getFiles(archiveFileName) {
 }
 
 function extractFile(archiveFileName, fileName, destinationDirectory) {
-	const result = cp.spawnSync(sevenZipExe, [ "e", archiveFileName, "-y", `-o${destinationDirectory}`, fileName ], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "e", archiveFileName, "-y", `-o${destinationDirectory}`, fileName ], { stdio: "pipe" });
+	if (result.error) { throw result.error; }
 	return result.status === 0;
 }
 
@@ -77,7 +89,8 @@ function getFileContents(archiveFileName, fileName) {
 function addInfoToArchive(archiveFileName, fileName, content) {
 	const tempFileName = path.resolve(__dirname, fileName);
 	fs.writeFileSync(tempFileName, content, { encoding: "utf8" });
-	const result = cp.spawnSync(sevenZipExe, [ "a", archiveFileName, tempFileName ], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "a", archiveFileName, tempFileName ], { stdio: "pipe" });
+	if (result.error) { throw result.error; }
 	if (result.status !== 0) { return false; }
 	fs.unlinkSync(tempFileName);
 	return true;
@@ -162,20 +175,29 @@ async function searchForImage(imageSource, site, jar) {
 		`https://${site}/?f_shash=${hash}&fs_similar=0&fs_exp=1&fs_covers=0&f_cats=0`
 	];
 
-	for (const url of urls) {
-		const data = await httpsGetAsync(url, jar);
-		if (isSadpanda(data.response)) { return []; }
+	for (const searchUrl of urls) {
+		const data = await httpsGetAsync(searchUrl, jar);
+		if (isSadpanda(data.response)) { break; }
 
-		const results = getSearchResults(data.body.toString("utf8"));
-		if (results.length > 0) { return results; }
+		const galleryUrls = getSearchResults(data.body.toString("utf8"));
+		if (galleryUrls.length > 0) { return { galleryUrls, searchUrl }; }
 	}
 
-	return [];
+	return { galleryUrls: [], searchUrl: urls[urls.length - 1] };
 }
 
 
 async function addMetadata(archiveFileName) {
-	const files = getFiles(archiveFileName);
+	let files;
+	try {
+		files = getFiles(archiveFileName);
+	} catch (e) {
+		if (e.code === "ENOENT") {
+			throw new Error("7z executable could not be found");
+		}
+		throw e;
+	}
+
 	const infoJsonFileName = "info.json";
 	if (files.length === 0) {
 		throw new Error("Invalid archive");
@@ -195,7 +217,7 @@ async function addMetadata(archiveFileName) {
 	const site = (useEx ? "exhentai.org" : "e-hentai.org");
 	const jar = createCookieJar(exCookieString, site);
 
-	const galleryUrls = await searchForImage(imageSource, site, jar);
+	const {galleryUrls, searchUrl} = await searchForImage(imageSource, site, jar);
 
 	let galleryInfo = null;
 	for (const galleryUrl of galleryUrls) {
@@ -203,7 +225,7 @@ async function addMetadata(archiveFileName) {
 		if (galleryInfo !== null) { break; }
 	}
 	if (galleryInfo === null) {
-		throw new Error("No results");
+		throw new Error(`No results (${searchUrl})`);
 	}
 
 	const data = {

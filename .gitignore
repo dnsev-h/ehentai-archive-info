@@ -7,4 +7,5 @@ info.json
 *.cbr
 *.7z
 node_modules/
+cookie.txt
 cookies.txt
