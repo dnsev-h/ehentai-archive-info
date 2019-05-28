@@ -1,0 +1,9 @@
+.vscode/
+temp/
+info.json
+*.zip
+*.rar
+*.cbz
+*.cbr
+*.7z
+node_modules/
