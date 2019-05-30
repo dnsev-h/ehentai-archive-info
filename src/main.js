@@ -41,7 +41,7 @@ function getIndexOfMatch(array, regex, start) {
 }
 
 function getFiles(archiveFileName) {
-	const result = trySpawnSync(sevenZipExes, [ "l", archiveFileName ], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "l", "-sccUTF-8", archiveFileName ], { stdio: "pipe" });
 	if (result.error) { throw result.error; }
 	if (result.status !== 0) { return []; }
 
@@ -68,22 +68,10 @@ function getFiles(archiveFileName) {
 	return results;
 }
 
-function extractFile(archiveFileName, fileName, destinationDirectory) {
-	const result = trySpawnSync(sevenZipExes, [ "e", archiveFileName, "-y", `-o${destinationDirectory}`, fileName ], { stdio: "pipe" });
-	if (result.error) { throw result.error; }
-	return result.status === 0;
-}
-
 function getFileContents(archiveFileName, fileName) {
-	const tempDir = path.resolve(__dirname, "temp");
-	if (!extractFile(archiveFileName, fileName, tempDir)) {
-		throw new Error("Failed to extract image");
-	}
-	const tempFile = path.resolve(tempDir, path.basename(fileName));
-	const tempFileContent = fs.readFileSync(tempFile, { encoding: null });
-	fs.unlinkSync(tempFile);
-	fs.rmdirSync(tempDir);
-	return tempFileContent;
+	const result = trySpawnSync(sevenZipExes, [ "e", archiveFileName, fileName, "-so",  ], { stdio: "pipe" });
+	if (result.error) { throw result.error; }
+	return result.stdout;
 }
 
 function addInfoToArchive(archiveFileName, fileName, content) {
