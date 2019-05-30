@@ -14,7 +14,7 @@ goto :eof
 
 set INPUT="%~1"
 
-echo Processing %~nx1...
+echo Processing "%~nx1"...
 node "%SCRIPT_DIR%src/main.js" %INPUT%
 echo.
 
