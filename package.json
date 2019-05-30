@@ -8,5 +8,9 @@
 		"request": "^2.88.0"
 	},
 	"scripts": {},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dnsev-h/ehentai-archive-info.git"
+	},
 	"license": "MIT"
 }
