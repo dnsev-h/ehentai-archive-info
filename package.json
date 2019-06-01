@@ -2,7 +2,7 @@
 	"name": "e-hentai-archive-metadata",
 	"version": "2.0.0",
 	"author": "dnsev-h",
-	"description": "Add info.json files to archives",
+	"description": "Add metadata files to E*Hentai gallery archives",
 	"dependencies": {
 		"html-entities": "^1.2.1",
 		"request": "^2.88.0"
