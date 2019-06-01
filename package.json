@@ -1,6 +1,6 @@
 {
 	"name": "e-hentai-archive-metadata",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"author": "dnsev-h",
 	"description": "Add info.json files to archives",
 	"dependencies": {
