@@ -11,6 +11,11 @@ function trySpawnSync(executables, args, options) {
 		result = cp.spawnSync(exe, args, options);
 		if (!result.error) { break; }
 	}
+	if (result !== null && result.error) {
+		if (result.error.code === "ENOENT") {
+			result.error = new Error("Failed to find 7zip executable");
+		}
+	}
 	return result;
 }
 
