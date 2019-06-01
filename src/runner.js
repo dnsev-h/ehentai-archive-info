@@ -228,12 +228,24 @@ class Runner {
 		const minImagesToCheck = Math.max(1, getInteger(archiveConfig.minImagesToCheck, 1));
 		const maxImagesToCheck = Math.max(1, getInteger(archiveConfig.maxImagesToCheck, 1));
 		const maxSearchErrors = Math.max(1, getInteger(archiveConfig.maxSearchErrors, 1));
+		const continueSearchIfResultsAreAmbiguous = !!archiveConfig.continueSearchIfResultsAreAmbiguous;
 		let checkCount = 0;
 		let checkCountWithResults = 0;
 		let errorCount = 0;
 		const searchResults = [];
+		const imageCount = images.length;
 
-		for (let i = 0, ii = images.length; i < ii && checkCount < maxImagesToCheck && checkCountWithResults < minImagesToCheck; ++i) {
+		for (let i = 0; i < imageCount; ++i) {
+			// Exit conditions
+			if (checkCount >= maxImagesToCheck) { break; }
+			if (checkCountWithResults >= minImagesToCheck && searchResults.length > 0) {
+				if (continueSearchIfResultsAreAmbiguous && this.areSearchResultsAmbiguous(searchResults)) {
+					this.log.debug("Continuing search because results are ambiguous");
+				} else {
+					break;
+				}
+			}
+
 			// Get image source
 			const imageFileName = images[i];
 			let imageSource;
@@ -281,6 +293,25 @@ class Runner {
 		}
 
 		return searchResults;
+	}
+
+	areSearchResultsAmbiguous(results) {
+		const ii = results.length;
+		if (ii === 0) { return true; }
+		if (ii > 1) {
+			let maxCount = 0;
+			for (let i = 0; i < ii; ++i) {
+				maxCount = Math.max(maxCount, results[i].count);
+			}
+
+			let resultsWithMaxCount = 0;
+			for (let i = 0; i < ii; ++i) {
+				if (results[i].count === maxCount && ++resultsWithMaxCount > 1) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	async searchForGalleriesWithImage(imageIndex, imageHash, delay) {
