@@ -380,8 +380,10 @@ class Runner {
 
 	updatePriorities(results, imageCount) {
 		// Priority for all
-		const tagPriorities = safeGet(() => this.config.lookup.priorities.tags, []);
-		const languagePriorities = safeGet(() => this.config.lookup.priorities.language, []);
+		const tagPriorities = safeGet(() => this.config.lookup.priorities.tags, null);
+		const languagePriorities = safeGet(() => this.config.lookup.priorities.language, null);
+		const titlePriorities = safeGet(() => this.config.lookup.priorities.title, null);
+		const titleOriginalPriorities = safeGet(() => this.config.lookup.priorities.titleOriginal, null);
 
 		for (const result of results) {
 			const priority = { total: 0.0, positive: 0.0, negative: 0.0, blacklist: false };
@@ -390,9 +392,9 @@ class Runner {
 				this.updatePrioritiesForTags(priority, result.info, tagPriorities);
 			}
 
-			if (Array.isArray(languagePriorities)) {
-				this.updatePrioritiesForLanguages(priority, result.info, languagePriorities);
-			}
+			this.updatePrioritiesForGenericField(priority, result.info, "language", languagePriorities);
+			this.updatePrioritiesForGenericField(priority, result.info, "title", titlePriorities);
+			this.updatePrioritiesForGenericField(priority, result.info, "titleOriginal", titleOriginalPriorities);
 
 			result.priority = priority;
 		}
@@ -447,17 +449,20 @@ class Runner {
 		}
 	}
 
-	updatePrioritiesForLanguages(value, info, languagePriorities) {
+	updatePrioritiesForGenericField(value, info, infoField, priorityEntries) {
+		if (!Array.isArray(priorityEntries)) { return; }
+
 		let any = false;
 		const defaults = [];
 
-		for (const languagePriority of languagePriorities) {
-			if (!util.isObject(languagePriority)) { continue; }
-			if (languagePriority.value === null) { defaults.push(languagePriority); }
-			if (typeof(languagePriority.value) !== "string") { continue; }
+		for (const priorityEntry of priorityEntries) {
+			if (!util.isObject(priorityEntry)) { continue; }
+			if (priorityEntry.value === null) { defaults.push(priorityEntry); }
+			if (typeof(priorityEntry.value) !== "string") { continue; }
 
-			if (util.matches(info.language || "", false, languagePriority.value)) {
-				applyPriority(value, languagePriority);
+			const field = info[infoField];
+			if (typeof(field) === "string" && util.matches(field, false, priorityEntry.value)) {
+				applyPriority(value, priorityEntry);
 				any = true;
 			}
 		}

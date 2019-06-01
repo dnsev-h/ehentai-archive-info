@@ -26,6 +26,12 @@
 				{ "value": "japanese", "priority": 1.0 },
 				{ "value": null, "priority": -1.0, "blacklist": false }
 			],
+			"title": [
+				{ "value": "regex:colorized", "priority": 0.0 }
+			],
+			"titleOriginal": [
+				{ "value": "regex:カラー化", "priority": 0.0 }
+			],
 			"fileCount": {
 				"nearest": { "priority": 0.5 },
 				"highest": { "priority": 0.0 },
