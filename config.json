@@ -1,0 +1,89 @@
+{
+	"general": {
+		"logFileName": "log.txt",
+		"sevenZipExeSearchLocations": [
+			"7z",
+			"C:\\Program Files\\7-Zip\\7z",
+			"C:\\Program Files (x86)\\7-Zip\\7z"
+		]
+	},
+	"lookup": {
+		"exCookiesFileName": "cookies.txt",
+		"searchExpunged": true,
+		"searchCoversOnly": false,
+		"maximumNumberOfResultsToCheck": 25,
+		"timeout": {
+			"gallerySearch": 5.0,
+			"apiCall": 5.0,
+			"skipOnCompletion": false
+		},
+		"priorities": {
+			"tags": [
+				{ "value": "misc:already uploaded", "priority": -1.0, "blacklist": false }
+			],
+			"language": [
+				{ "value": "english", "priority": 2.0 },
+				{ "value": "japanese", "priority": 1.0 },
+				{ "value": null, "priority": -1.0, "blacklist": false }
+			],
+			"fileCount": {
+				"nearest": { "priority": 0.5 },
+				"highest": { "priority": 0.0 },
+				"highestSearchMatches": { "priority": 1.0 }
+			}
+		}
+	},
+	"scanning": {
+		"scanFoldersForArchives": true,
+		"scanFoldersForImages": true,
+		"scanFoldersRecursiveDepth": 10,
+		"archiveFolderPermitNestedDirectores": true,
+		"ignoreFiles": [
+			"regex:^\\."
+		],
+		"ignoreDirectories": [
+			"regex:^\\.",
+			"node_modules"
+		],
+		"archiveFolderPermittedExtensions": [
+			".txt",
+			".json"
+		],
+		"imageFileExtensions": [
+			".jpg",
+			".jpeg",
+			".gif",
+			".bmp"
+		],
+		"archiveFileExtensions": [
+			".zip",
+			".rar",
+			".7z",
+			".cbr",
+			".cbz"
+		]
+	},
+	"archive": {
+		"file": {
+			"minImagesToCheck": 1,
+			"maxImagesToCheck": 5,
+			"maxSearchErrors": 1,
+			"preferredImageOrder": [ 0, 1, 2, 9 ],
+			"infoJsonFileNameInArchiveFile": "info.json",
+			"infoJsonFileNameInFolder": null,
+			"infoJsonFileNameInFolderOnFailure": "${name}.info.json",
+			"skipIfFileExistsInArchiveFile": [ "info.json" ],
+			"skipIfFileExistsInFolder": [ "${name}.info.json" ]
+		},
+		"folder": {
+			"minImagesToCheck": 1,
+			"maxImagesToCheck": 5,
+			"maxSearchErrors": 1,
+			"preferredImageOrder": [ 0, 1, 2, 9 ],
+			"infoJsonFileNameInFolder": "info.json",
+			"infoJsonFileNameInParentFolder": null,
+			"skipIfFileExistsInFolder": [ "info.json" ],
+			"skipIfFileExistsInParentFolder": [ "${name}.info.json" ]
+		}
+	}
+}
