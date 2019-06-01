@@ -11,6 +11,7 @@ class ArchiveFile extends Archive {
 		super(
 			fileName,
 			null,
+			true,
 			"file",
 			path.dirname(fileName),
 			util.removeExtension(path.basename(fileName)));
@@ -21,6 +22,7 @@ class ArchiveFile extends Archive {
 		if (f !== null) { return f; }
 
 		super.files = archiveUtil.getFiles(this.fileName);
+		super.partial = false;
 		return super.files;
 	}
 

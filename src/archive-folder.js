@@ -7,10 +7,11 @@ const Archive = require("./archive").Archive;
 
 
 class ArchiveFolder extends Archive {
-	constructor(fileName, files) {
+	constructor(fileName, files, partial) {
 		super(
 			fileName,
 			files,
+			partial,
 			"folder",
 			fileName,
 			path.basename(fileName));

@@ -58,14 +58,20 @@ class Runner {
 			this.initDependencies();
 			this.initCookies();
 
+			const targets = [];
 			for (const fileName of fileNames) {
+				this.getTargetsFromFileName(fileName, targets);
+			}
+
+			for (const target of targets) {
 				const logCountNew = this.log.counts.total;
 				if (logCountNew > logCount) {
 					this.log.info("");
 					logCount = logCountNew;
 				}
 
-				await this.processFileOrDirectory(fileName);
+				this.log.info(`Processing ${target.type}: ${target.fileName}...`);
+				await this.process(target);
 			}
 			return 0;
 		} catch (e) {
@@ -74,21 +80,6 @@ class Runner {
 		}
 	}
 
-
-	async processFileOrDirectory(fileName) {
-		let logCount = this.log.counts.total;
-		const targets = this.getTargetsFromFileName(fileName);
-		for (const target of targets) {
-			const logCountNew = this.log.counts.total;
-			if (logCountNew > logCount) {
-				this.log.info("");
-				logCount = logCountNew;
-			}
-
-			this.log.info(`Processing ${target.type}: ${target.fileName}...`);
-			await this.process(target);
-		}
-	}
 
 	async process(target) {
 		const archiveConfig = safeGet(() => this.config.archive[target.type], null);
@@ -125,7 +116,7 @@ class Runner {
 		}
 
 		// Update priorities and filter
-		this.updatePriorities(results, images.length);
+		this.updatePriorities(results, images.length, target.partial);
 
 		for (const result of results) {
 			this.log.debug(`${this.createGalleryUrl(result.id)} info: priority=${result.priority.total}; blacklist=${result.priority.blacklist}`);
@@ -378,7 +369,7 @@ class Runner {
 	}
 
 
-	updatePriorities(results, imageCount) {
+	updatePriorities(results, imageCount, isPartial) {
 		// Priority for all
 		const tagPriorities = safeGet(() => this.config.lookup.priorities.tags, null);
 		const languagePriorities = safeGet(() => this.config.lookup.priorities.language, null);
@@ -400,10 +391,12 @@ class Runner {
 		}
 
 		// Priority for best
-		this.updatePriorityForBest(
-			results,
-			() => this.config.lookup.priorities.fileCount.nearest,
-			(result) => Math.abs(imageCount - result.info.fileCount));
+		if (!isPartial) {
+			this.updatePriorityForBest(
+				results,
+				() => this.config.lookup.priorities.fileCount.nearest,
+				(result) => Math.abs(imageCount - result.info.fileCount));
+		}
 
 		this.updatePriorityForBest(
 			results,
@@ -527,30 +520,33 @@ class Runner {
 	}
 
 
-	getTargetsFromFileName(fileName) {
+	getTargetsFromFileName(fileName, targets) {
 		let info;
 		try {
 			info = fs.lstatSync(fileName);
 		} catch (e) {
 			this.log.error(`Invalid file: ${fileName}`);
-			return [];
+			return;
 		}
 
 		if (info.isDirectory()) {
-			return this.getTargetsInDirectory(fileName);
+			this.getTargetsInDirectory(fileName, targets);
+			return;
 		}
 
 		if (info.isFile()) {
+			const imageFileExtensions = getArray(safeGet(() => this.config.scanning.imageFileExtensions, []));
 			const archiveFileExtensions = getArray(safeGet(() => this.config.scanning.archiveFileExtensions, []));
 			if (util.fileHasExtension(fileName, archiveFileExtensions)) {
-				return [ new ArchiveFile(fileName) ];
+				targets.push(new ArchiveFile(fileName));
+			}
+			else if (util.fileHasExtension(fileName, imageFileExtensions)) {
+				targets.push(new ArchiveFolder(path.dirname(fileName), [ fileName ], true));
 			}
 		}
-
-		return []
 	}
 
-	getTargetsInDirectory(fileName) {
+	getTargetsInDirectory(fileName, targets) {
 		const scanFoldersForArchives = !!safeGet(() => this.config.scanning.scanFoldersForArchives, false);
 		const scanFoldersForImages = !!safeGet(() => this.config.scanning.scanFoldersForImages, false);
 		const ignoreFiles = getArray(safeGet(() => this.config.scanning.ignoreFiles, []));
@@ -561,7 +557,6 @@ class Runner {
 		const imageFileExtensions = getArray(safeGet(() => this.config.scanning.imageFileExtensions, []));
 		const archiveFolderPermittedExtensions = getArray(safeGet(() => this.config.scanning.archiveFolderPermittedExtensions, []));
 
-		const targets = [];
 		const scanDirectories = [{ fileName, depth: 0 }];
 
 		while (scanDirectories.length > 0) {
@@ -590,7 +585,7 @@ class Runner {
 
 			const isArchiveFolder = (archiveImages.length > 0 && archiveFiles.length == files.length && scanFoldersForImages);
 			if (isArchiveFolder) {
-				targets.push(new ArchiveFolder(info.fileName, archiveFiles.map((f) => path.relative(info.fileName, f))));
+				targets.push(new ArchiveFolder(info.fileName, archiveFiles.map((f) => path.relative(info.fileName, f)), false));
 			}
 
 			if (!isArchiveFolder || archiveFolderPermitNestedDirectores) {
@@ -600,8 +595,6 @@ class Runner {
 				}
 			}
 		}
-
-		return targets;
 	}
 
 

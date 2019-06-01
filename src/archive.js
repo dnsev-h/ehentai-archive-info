@@ -4,11 +4,12 @@ const util = require("./util");
 
 
 class Archive {
-	constructor(fileName, files, type, dirName, name) {
+	constructor(fileName, files, partial, type, dirName, name) {
 		if (files !== null && !Array.isArray(files)) { throw new TypeError("Invalid value for files"); }
 
 		this._fileName = fileName;
 		this._files = files;
+		this._partial = partial;
 		this._type = type;
 		this._dirName = dirName;
 		this._name = name;
@@ -37,6 +38,13 @@ class Archive {
 	set files(value) {
 		if (!Array.isArray(value)) { throw new TypeError("Invalid value"); }
 		this._files = value;
+	}
+
+	get partial() {
+		return this._partial;
+	}
+	set partial(value) {
+		this._partial = value;
 	}
 
 
