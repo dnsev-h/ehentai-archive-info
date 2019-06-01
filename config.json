@@ -19,7 +19,8 @@
 		},
 		"priorities": {
 			"tags": [
-				{ "value": "misc:already uploaded", "priority": -1.0, "blacklist": false }
+				{ "value": "misc:already uploaded", "priority": -1.0, "blacklist": false },
+				{ "value": "misc:incomplete", "priority": -1.0, "blacklist": false }
 			],
 			"language": [
 				{ "value": "english", "priority": 2.0 },
