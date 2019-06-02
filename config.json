@@ -12,7 +12,7 @@
 		"searchExpunged": true,
 		"searchCoversOnly": false,
 		"maximumNumberOfResultsToCheck": 25,
-		"timeout": {
+		"delay": {
 			"gallerySearch": 5.0,
 			"apiCall": 5.0,
 			"skipOnCompletion": false

@@ -29,7 +29,7 @@ class Runner {
 		let logCount = this.log.counts.total;
 		const result = await this.runInternal(fileNames);
 
-		const skipOnCompletion = safeGet(() => this.config.lookup.timeout.skipOnCompletion, false);
+		const skipOnCompletion = safeGet(() => this.config.lookup.delay.skipOnCompletion, false);
 		if (!skipOnCompletion) {
 			const delays = this.getIncompleteDelays();
 			if (delays.length > 0) {
@@ -215,7 +215,7 @@ class Runner {
 
 
 	async getSearchResults(target, images, archiveConfig) {
-		const searchDelay = getNumber(this.config.lookup.timeout.gallerySearch, 1.0);
+		const searchDelay = getNumber(this.config.lookup.delay.gallerySearch, 1.0);
 		const minImagesToCheck = Math.max(1, getInteger(archiveConfig.minImagesToCheck, 1));
 		const maxImagesToCheck = Math.max(1, getInteger(archiveConfig.maxImagesToCheck, 1));
 		const maxSearchErrors = Math.max(1, getInteger(archiveConfig.maxSearchErrors, 1));
@@ -334,7 +334,7 @@ class Runner {
 
 	async getSearchResultsInfo(searchResults) {
 		const delayName = "api";
-		const searchDelay = getNumber(this.config.lookup.timeout.apiCall, 5.0);
+		const searchDelay = getNumber(this.config.lookup.delay.apiCall, 5.0);
 
 		const maximumNumberOfResultsToCheck = Math.max(1, getInteger(safeGet(() => this.config.lookup.maximumNumberOfResultsToCheck, 1), 1));
 
