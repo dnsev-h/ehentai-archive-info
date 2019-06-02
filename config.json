@@ -59,6 +59,7 @@
 		"imageFileExtensions": [
 			".jpg",
 			".jpeg",
+			".png",
 			".gif",
 			".bmp"
 		],

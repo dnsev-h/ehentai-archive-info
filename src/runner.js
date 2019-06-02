@@ -583,7 +583,7 @@ class Runner {
 				}
 			}
 
-			const isArchiveFolder = (archiveImages.length > 0 && archiveFiles.length == files.length && scanFoldersForImages);
+			const isArchiveFolder = (archiveImages.length > 0 && archiveFiles.length === files.length && scanFoldersForImages);
 			if (isArchiveFolder) {
 				targets.push(new ArchiveFolder(info.fileName, archiveFiles.map((f) => path.relative(info.fileName, f)), false));
 			}
