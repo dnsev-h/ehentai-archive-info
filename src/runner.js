@@ -168,18 +168,18 @@ class Runner {
 		const jsonString = JSON.stringify(json, null, "  ");
 		const infoJsonContent = Buffer.from(jsonString, "utf8");
 
-		let fileName = safeGet(() => target.getFileNameFormat(archiveConfig.infoJsonFileNameInArchiveFile), null);
+		let fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInArchiveFile), null);
 		const success = this.tryWriteInfoFile(target, null, fileName, infoJsonContent);
 
 		if (!success) {
-			fileName = safeGet(() => target.getFileNameFormat(archiveConfig.infoJsonFileNameInFolderOnFailure), null);
+			fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInFolderOnFailure), null);
 			this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent);
 		}
 
-		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.infoJsonFileNameInFolder), null);
+		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInFolder), null);
 		this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent);
 
-		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.infoJsonFileNameInParentFolder), null);
+		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInParentFolder), null);
 		this.tryWriteInfoFile(target, path.dirname(target.dirName), fileName, infoJsonContent);
 	}
 

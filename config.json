@@ -77,9 +77,9 @@
 			"maxSearchErrors": 1,
 			"continueSearchIfResultsAreAmbiguous": true,
 			"preferredImageOrder": [ 0, 1, 2, 9 ],
-			"infoJsonFileNameInArchiveFile": "info.json",
-			"infoJsonFileNameInFolder": null,
-			"infoJsonFileNameInFolderOnFailure": "${name}.info.json",
+			"metadataFileNameInArchiveFile": "info.json",
+			"metadataFileNameInFolder": null,
+			"metadataFileNameInFolderOnFailure": "${name}.info.json",
 			"skipIfFileExistsInArchiveFile": [ "info.json" ],
 			"skipIfFileExistsInFolder": [ "${name}.info.json" ]
 		},
@@ -89,8 +89,8 @@
 			"maxSearchErrors": 1,
 			"continueSearchIfResultsAreAmbiguous": true,
 			"preferredImageOrder": [ 0, 1, 2, 9 ],
-			"infoJsonFileNameInFolder": "info.json",
-			"infoJsonFileNameInParentFolder": null,
+			"metadataFileNameInFolder": "info.json",
+			"metadataFileNameInParentFolder": null,
 			"skipIfFileExistsInFolder": [ "info.json" ],
 			"skipIfFileExistsInParentFolder": [ "${name}.info.json" ]
 		}
