@@ -687,7 +687,8 @@ function getFilteredImageList(list, priorityOrder) {
 	const visited = new Array(list.length).fill(false);
 	const results = [];
 	let index = 0;
-	for (const i of priorityOrder) {
+	for (let i of priorityOrder) {
+		if (i < 0) { i = list.length + i; }
 		if (i >= 0 && i < list.length && !visited[i]) {
 			index = i;
 			visited[index] = true;
