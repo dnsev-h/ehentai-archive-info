@@ -191,7 +191,7 @@ class Runner {
 		fileName = target.getFileNameFormat(fileName);
 		if (directory !== null) {
 			fileName = path.resolve(directory, fileName);
-			displayFileName = path.relative(target.dirName, fileName)
+			displayFileName = path.relative(target.dirName, fileName);
 			extra = "";
 		} else {
 			displayFileName = fileName;
@@ -672,7 +672,7 @@ function getInteger(value, defaultValue) {
 }
 
 function parseCookieString(cookieString) {
-	const re = /\s*([^=]*)=([^;]*)(?:;|$)/g
+	const re = /\s*([^=]*)=([^;]*)(?:;|$)/g;
 	let match;
 	const results = {};
 	while ((match = re.exec(cookieString)) !== null) {

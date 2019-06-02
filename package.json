@@ -12,5 +12,27 @@
 		"type": "git",
 		"url": "https://github.com/dnsev-h/ehentai-archive-info.git"
 	},
-	"license": "MIT"
+	"license": "MIT",
+	"jshintConfig": {
+		"browser": false,
+		"browserify": false,
+		"node": true,
+		"devel": true,
+		"esversion": "8",
+		"maxerr": 50,
+		"noarg": true,
+		"nocomma": true,
+		"nonbsp": true,
+		"eqeqeq": true,
+		"bitwise": true,
+		"leanswitch": true,
+		"strict": true,
+		"undef": true,
+		"curly": true,
+		"eqnull": false,
+		"forin" : true,
+		"varstmt" : false,
+		"unused": "vars",
+		"quotmark": "double"
+	}
 }

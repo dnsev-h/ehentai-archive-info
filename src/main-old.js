@@ -86,7 +86,7 @@ function addInfoToArchive(archiveFileName, fileName, content) {
 
 
 function parseCookieString(cookieString) {
-	const re = /\s*([^=]*)=([^;]*)(?:;|$)/g
+	const re = /\s*([^=]*)=([^;]*)(?:;|$)/g;
 	let match;
 	const results = {};
 	while ((match = re.exec(cookieString)) !== null) {
