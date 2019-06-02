@@ -507,6 +507,7 @@ class Runner {
 	getIncompleteDelays() {
 		const names = [];
 		for (const name in this.delays) {
+			if (!Object.prototype.hasOwnProperty.call(this.delays, name)) { continue; }
 			const delay = this.delays[name];
 			if (delay !== null) { names.push(name); }
 		}
@@ -623,6 +624,7 @@ class Runner {
 			const cookies = parseCookieString(exCookieString);
 			const requiredCookieNames = [ "ipb_member_id", "ipb_pass_hash", "igneous" ];
 			for (const key in cookies) {
+				if (!Object.prototype.hasOwnProperty.call(cookies, key)) { continue; }
 				if (requiredCookieNames.indexOf(key) < 0) { continue; }
 				this.cookieJar.setCookie(request.cookie(`${key}=${cookies[key]}`), this.site);
 			}

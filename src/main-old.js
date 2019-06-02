@@ -147,6 +147,7 @@ function createCookieJar(exCookieString, site) {
 		const cookies = parseCookieString(exCookieString);
 		const requiredCookieNames = [ "ipb_member_id", "ipb_pass_hash", "igneous" ];
 		for (const key in cookies) {
+			if (!Object.prototype.hasOwnProperty.call(cookies, key)) { continue; }
 			if (requiredCookieNames.indexOf(key) < 0) { continue; }
 			jar.setCookie(request.cookie(`${key}=${cookies[key]}`), `https://${site}/`);
 		}
