@@ -2,10 +2,7 @@
 
 set SCRIPT_DIR=%~dp0
 
-for %%f in (%*) do (
-	set INPUT=%%f
-	call :convert
-)
+node "%SCRIPT_DIR%src/main.js" %* || goto :error
 
 color a
 pause
@@ -13,9 +10,10 @@ color
 goto :eof
 
 
-:convert
+:error
 
-node "%SCRIPT_DIR%src/main.js" %INPUT%
-echo.
+color c
+pause
+color
 
 goto :eof
