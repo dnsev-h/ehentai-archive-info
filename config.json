@@ -14,7 +14,9 @@
 		"maximumNumberOfResultsToCheck": 25,
 		"delay": {
 			"gallerySearch": 10.0,
+			"gallerySearchRandom": 0.0,
 			"apiCall": 5.0,
+			"apiCallRandom": 0.0,
 			"skipOnCompletion": false
 		},
 		"priorities": {

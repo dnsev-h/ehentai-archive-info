@@ -216,6 +216,7 @@ class Runner {
 
 	async getSearchResults(target, images, archiveConfig) {
 		const searchDelay = getNumber(this.config.lookup.delay.gallerySearch, 1.0);
+		const searchDelayRandom = getNumber(this.config.lookup.delay.gallerySearchRandom, 0.0);
 		const minImagesToCheck = Math.max(1, getInteger(archiveConfig.minImagesToCheck, 1));
 		const maxImagesToCheck = Math.max(1, getInteger(archiveConfig.maxImagesToCheck, 1));
 		const maxSearchErrors = Math.max(1, getInteger(archiveConfig.maxSearchErrors, 1));
@@ -253,7 +254,7 @@ class Runner {
 			// Lookup
 			let results;
 			try {
-				results = await this.searchForGalleriesWithImage(checkCount, imageHash, searchDelay);
+				results = await this.searchForGalleriesWithImage(checkCount, imageHash, searchDelay, searchDelayRandom);
 			} catch (e) {
 				this.log.error(`Failed to look up image: ${imageFileName}`, e);
 				if (++errorCount >= maxSearchErrors) { break; }
@@ -305,7 +306,7 @@ class Runner {
 		return false;
 	}
 
-	async searchForGalleriesWithImage(imageIndex, imageHash, delay) {
+	async searchForGalleriesWithImage(imageIndex, imageHash, delay, delayRandom) {
 		const delayName = "search";
 
 		const searchExpunged = !!safeGet(() => this.config.lookup.searchExpunged, false);
@@ -325,7 +326,7 @@ class Runner {
 
 			await this.waitForDelay(delayName);
 			results = await lookup.getSearchResults(url, this.cookieJar);
-			this.setDelay(delayName, delay);
+			this.setDelay(delayName, delay + Math.random() * delayRandom);
 
 			if (results.length > 0) { break; }
 		}
@@ -335,6 +336,7 @@ class Runner {
 	async getSearchResultsInfo(searchResults) {
 		const delayName = "api";
 		const searchDelay = getNumber(this.config.lookup.delay.apiCall, 5.0);
+		const searchDelayRandom = getNumber(this.config.lookup.delay.apiCallRandom, 0.0);
 
 		const maximumNumberOfResultsToCheck = Math.max(1, getInteger(safeGet(() => this.config.lookup.maximumNumberOfResultsToCheck, 1), 1));
 
@@ -354,7 +356,7 @@ class Runner {
 
 			await this.waitForDelay(delayName);
 			const galleryInfos = await lookup.getGalleryInfos(this.site, this.cookieJar, galleryIdentifiers);
-			this.setDelay(delayName, searchDelay);
+			this.setDelay(delayName, searchDelay + Math.random() * searchDelayRandom);
 			for (let j = 0, jj = galleryInfos.length; j < jj; ++j) {
 				const info = galleryInfos[j];
 				if (info.error) {

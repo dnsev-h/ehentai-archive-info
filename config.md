@@ -35,8 +35,12 @@ adjusted depending on the needs.
     "delay": {
       // Minimum delay between gallery searches (in seconds).
       "gallerySearch": 10.0,
+      // A random number of seconds in the range [0, apiCallRandom) to be added to the delay.
+      "gallerySearchRandom": 0.0,
       // Minimum delay between API calls (in seconds).
       "apiCall": 5.0,
+      // A random number of seconds in the range [0, apiCallRandom) to be added to the delay.
+      "apiCallRandom": 0.0,
       // Whether or not any remaining delays should be skipped when the script is exiting.
       "skipOnCompletion": false
     },
