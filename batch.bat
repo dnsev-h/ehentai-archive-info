@@ -2,7 +2,10 @@
 
 set SCRIPT_DIR=%~dp0
 
-for %%f in (%*) do call :convert %%f
+for %%f in (%*) do (
+	set INPUT=%%f
+	call :convert
+)
 
 color a
 pause
@@ -12,9 +15,6 @@ goto :eof
 
 :convert
 
-set INPUT="%~1"
-
-echo Processing "%~nx1"...
 node "%SCRIPT_DIR%src/main.js" %INPUT%
 echo.
 
