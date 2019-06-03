@@ -127,7 +127,28 @@ adjusted depending on the needs.
       ".7z",
       ".cbr",
       ".cbz"
-    ]
+    ],
+    // Filtering rules for different types of archives.
+    "targetFiltering": {
+      // File archive filtering rules.
+      "file": {
+        // List of file match patterns. Only files matching one of these
+        // patterns will be processed. An empty array means no whitelist.
+        // Regular expressions should be used.
+        "fileNameWhitelist": [
+          // Example: "regex:RAW/.*$"
+        ],
+        // List of file match patterns. Only files not matching any of these
+        // patterns will be processed. An empty array means no blacklist.
+        // Regular expressions should be used.
+        "fileNameBlacklist": []
+      },
+      // File archive filtering rules. Same format as above.
+      "folder": {
+        "fileNameWhitelist": [],
+        "fileNameBlacklist": []
+      }
+    }
   },
 
   // Options for how to handle different types of archives.

@@ -576,7 +576,11 @@ class Runner {
 
 			for (const file of files) {
 				if (scanFoldersForArchives && util.fileHasExtension(file, archiveFileExtensions)) {
-					targets.push(new ArchiveFile(file));
+					if (this.isValidTarget(file, "file")) {
+						targets.push(new ArchiveFile(file));
+					} else {
+						this.log.debug(`Potential target file filtered: ${file}`);
+					}
 				}
 
 				if (util.fileHasExtension(file, imageFileExtensions)) {
@@ -587,9 +591,14 @@ class Runner {
 				}
 			}
 
-			const isArchiveFolder = (archiveImages.length > 0 && archiveFiles.length === files.length && scanFoldersForImages);
+			let isArchiveFolder = (archiveImages.length > 0 && archiveFiles.length === files.length && scanFoldersForImages);
 			if (isArchiveFolder) {
-				targets.push(new ArchiveFolder(info.fileName, archiveFiles.map((f) => path.relative(info.fileName, f)), false));
+				if (this.isValidTarget(info.fileName, "folder")) {
+					targets.push(new ArchiveFolder(info.fileName, archiveFiles.map((f) => path.relative(info.fileName, f)), false));
+				} else {
+					this.log.debug(`Potential target folder filtered: ${info.fileName}`);
+					isArchiveFolder = false;
+				}
 			}
 
 			if (!isArchiveFolder || archiveFolderPermitNestedDirectores) {
@@ -601,6 +610,41 @@ class Runner {
 		}
 	}
 
+
+	isValidTarget(fileName, type) {
+		const whitelist = getArray(safeGet(() => this.config.scanning.targetFiltering[type].fileNameWhitelist, null));
+		const blacklist = getArray(safeGet(() => this.config.scanning.targetFiltering[type].fileNameBlacklist, null));
+
+		if (whitelist.length === 0 && blacklist.length === 0) { return true; }
+
+		fileName = path.normalize(fileName);
+		if (path.sep === "\\") {
+			fileName = fileName.replace(/\\/g, "/");
+		}
+
+		if (whitelist.length > 0) {
+			let any = false;
+			for (const e of whitelist) {
+				if (typeof(e) !== "string") { continue; }
+				if (util.matches(fileName, false, e)) {
+					any = true;
+					break;
+				}
+			}
+			if (!any) { return false; }
+		}
+
+		if (blacklist.length > 0) {
+			for (const e of blacklist) {
+				if (typeof(e) !== "string") { continue; }
+				if (util.matches(fileName, false, e)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 
 	createGalleryUrl(identifier) {
 		return `${this.site}/g/${identifier.id}/${identifier.token}/`;

@@ -71,7 +71,17 @@
 			".7z",
 			".cbr",
 			".cbz"
-		]
+		],
+		"targetFiltering": {
+			"file": {
+				"fileNameWhitelist": [],
+				"fileNameBlacklist": []
+			},
+			"folder": {
+				"fileNameWhitelist": [],
+				"fileNameBlacklist": []
+			}
+		}
 	},
 	"archive": {
 		"file": {
