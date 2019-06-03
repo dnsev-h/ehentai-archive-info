@@ -527,6 +527,7 @@ class Runner {
 			info = fs.lstatSync(fileName);
 		} catch (e) {
 			this.log.error(`Invalid file: ${fileName}`);
+			this.log.debug(e);
 			return;
 		}
 
