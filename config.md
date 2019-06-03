@@ -34,7 +34,7 @@ adjusted depending on the needs.
     // Delay settings for different types of HTTP requests.
     "delay": {
       // Minimum delay between gallery searches (in seconds).
-      "gallerySearch": 5.0,
+      "gallerySearch": 10.0,
       // Minimum delay between API calls (in seconds).
       "apiCall": 5.0,
       // Whether or not any remaining delays should be skipped when the script is exiting.

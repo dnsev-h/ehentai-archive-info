@@ -13,7 +13,7 @@
 		"searchCoversOnly": false,
 		"maximumNumberOfResultsToCheck": 25,
 		"delay": {
-			"gallerySearch": 5.0,
+			"gallerySearch": 10.0,
 			"apiCall": 5.0,
 			"skipOnCompletion": false
 		},
