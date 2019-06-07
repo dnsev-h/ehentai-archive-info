@@ -209,7 +209,7 @@ class Runner {
 			return false;
 		}
 
-		this.log.info(`Successfully added metadata${extra}: ${displayFileName}`);
+		this.log.successInfo(`Successfully added metadata${extra}: ${displayFileName}`);
 		return true;
 	}
 

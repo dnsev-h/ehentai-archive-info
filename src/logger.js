@@ -13,6 +13,7 @@ class Logger {
 		this.verbose = false;
 		this.newline = "\r\n";
 
+		this.useColor = true;
 		this.counts = {
 			info: 0,
 			error: 0,
@@ -27,8 +28,18 @@ class Logger {
 		++this.counts.info;
 		++this.counts.total;
 	}
+	successInfo(...messages) {
+		const prefix = this.useColor ? "\x1b[1m\x1b[32m" : ""; // green
+		const suffix = this.useColor ? "\x1b[0m" : ""; // reset
+		logToStream(this.infoStream, this.infoStreamVerbose || this.verbose, prefix, suffix + this.newline, messages);
+		logToStream(this.logStream, this.logStreamVerbose || this.verbose, "INFO: ", this.newline, messages);
+		++this.counts.info;
+		++this.counts.total;
+	}
 	error(...messages) {
-		logToStream(this.errorStream, this.errorStreamVerbose || this.verbose, "", this.newline, messages);
+		const prefix = this.useColor ? "\x1b[1m\x1b[31m" : ""; // red
+		const suffix = this.useColor ? "\x1b[0m" : ""; // reset
+		logToStream(this.errorStream, this.errorStreamVerbose || this.verbose, prefix, suffix + this.newline, messages);
 		logToStream(this.logStream, this.logStreamVerbose || this.verbose, "ERROR: ", this.newline, messages);
 		++this.counts.error;
 		++this.counts.total;
