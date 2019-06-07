@@ -3,6 +3,7 @@
 const cp = require("child_process");
 
 const sevenZipExes = [ "7z" ];
+const maxBuffer = 1024 * 1024 * 1024; // 1 GiB
 
 
 function trySpawnSync(executables, args, options) {
@@ -10,7 +11,7 @@ function trySpawnSync(executables, args, options) {
 	const errors = [];
 	for (const exe of executables) {
 		result = cp.spawnSync(exe, args, options);
-		if (!result.error) { break; }
+		if (!result.error) { return result; }
 		errors.push(result.error);
 	}
 
@@ -23,7 +24,7 @@ function trySpawnSync(executables, args, options) {
 		result.error = nonEnoentErrors[nonEnoentErrors.length - 1];
 		for (const e of nonEnoentErrors) {
 			if (e.code === "ENOBUFS") {
-				result.error = new Error("Unknown memory error (ENOBUFS)");
+				result.error = new Error("Buffer size exceeded");
 				break;
 			}
 		}
@@ -41,7 +42,7 @@ function getIndexOfMatch(array, regex, start) {
 
 
 function getFiles(archiveFileName) {
-	const result = trySpawnSync(sevenZipExes, [ "l", "-sccUTF-8", archiveFileName ], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "l", "-sccUTF-8", archiveFileName ], { stdio: "pipe", maxBuffer });
 	if (result.error) { throw result.error; }
 	if (result.status !== 0) { return []; }
 
@@ -69,13 +70,13 @@ function getFiles(archiveFileName) {
 }
 
 function getFileContents(archiveFileName, fileName) {
-	const result = trySpawnSync(sevenZipExes, [ "e", "-so" , archiveFileName, fileName], { stdio: "pipe" });
+	const result = trySpawnSync(sevenZipExes, [ "e", "-so" , archiveFileName, fileName], { stdio: "pipe", maxBuffer });
 	if (result.error) { throw result.error; }
 	return result.stdout;
 }
 
 function addFile(archiveFileName, fileName, content) {
-	const result = trySpawnSync(sevenZipExes, [ "a", archiveFileName, `-si${fileName}` ], { stdio: "pipe", input: content });
+	const result = trySpawnSync(sevenZipExes, [ "a", archiveFileName, `-si${fileName}` ], { stdio: "pipe", input: content, maxBuffer });
 	if (result.error) { throw result.error; }
 	if (result.status !== 0) { return false; }
 	return true;
