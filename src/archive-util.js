@@ -7,15 +7,28 @@ const sevenZipExes = [ "7z" ];
 
 function trySpawnSync(executables, args, options) {
 	let result = null;
+	const errors = [];
 	for (const exe of executables) {
 		result = cp.spawnSync(exe, args, options);
 		if (!result.error) { break; }
+		errors.push(result.error);
 	}
-	if (result !== null && result.error) {
-		if (result.error.code === "ENOENT") {
-			result.error = new Error("Failed to find 7zip executable");
+
+	if (result === null) { return result; }
+
+	const nonEnoentErrors = errors.filter((r) => r.code !== "ENOENT");
+	if (nonEnoentErrors.length === 0) {
+		result.error = new Error("Failed to find 7zip executable");
+	} else {
+		result.error = nonEnoentErrors[nonEnoentErrors.length - 1];
+		for (const e of nonEnoentErrors) {
+			if (e.code === "ENOBUFS") {
+				result.error = new Error("Unknown memory error (ENOBUFS)");
+				break;
+			}
 		}
 	}
+
 	return result;
 }
 
