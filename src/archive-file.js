@@ -27,19 +27,26 @@ class ArchiveFile extends Archive {
 	}
 
 	findExistingFileInArchive(matchTextList) {
-		return this.getMatchingFile(this.files, matchTextList);
+		const fileName = this.getMatchingFile(this.files, matchTextList);
+		return fileName !== null ? { fileName, type: "archive" } : null;
 	}
 
 	findExistingFileInFolder(matchTextList) {
-		if (!Array.isArray(matchTextList)) { return null; }
-		const files = util.getFilesAndDirectories(this.dirName).files.map((f) => path.basename(f));
-		return this.getMatchingFile(files, matchTextList);
+		let fileName = null;
+		if (Array.isArray(matchTextList)) {
+			const files = util.getFilesAndDirectories(this.dirName).files.map((f) => path.basename(f));
+			fileName = this.getMatchingFile(files, matchTextList);
+		}
+		return fileName !== null ? { fileName, type: "folder" } : null;
 	}
 
 	findExistingFileInParentFolder(matchTextList) {
-		if (!Array.isArray(matchTextList)) { return null; }
-		const files = util.getFilesAndDirectories(path.dirname(this.dirName)).files.map((f) => path.basename(f));
-		return this.getMatchingFile(files, matchTextList);
+		let fileName = null;
+		if (Array.isArray(matchTextList)) {
+			const files = util.getFilesAndDirectories(path.dirname(this.dirName)).files.map((f) => path.basename(f));
+			fileName = this.getMatchingFile(files, matchTextList);
+		}
+		return fileName !== null ? { fileName, type: "folder-parent" } : null;
 	}
 
 	readFile(fileName) {

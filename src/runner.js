@@ -138,19 +138,19 @@ class Runner {
 	shouldSkipTarget(target, archiveConfig) {
 		let file = target.findExistingFileInArchive(archiveConfig.skipIfFileExistsInArchiveFile);
 		if (file !== null) {
-			this.log.info(`Skipped because ${file} already exists inside archive`);
+			this.log.info(`Skipped because ${file.fileName} already exists inside archive`);
 			return true;
 		}
 
 		file = target.findExistingFileInFolder(archiveConfig.skipIfFileExistsInFolder);
 		if (file !== null) {
-			this.log.info(`Skipped because ${file} already exists inside folder`);
+			this.log.info(`Skipped because ${file.fileName} already exists inside folder`);
 			return true;
 		}
 
 		file = target.findExistingFileInParentFolder(archiveConfig.skipIfFileExistsInParentFolder);
 		if (file !== null) {
-			this.log.info(`Skipped because ${file} already exists inside parent folder`);
+			this.log.info(`Skipped because ${file.fileName} already exists inside parent folder`);
 			return true;
 		}
 
