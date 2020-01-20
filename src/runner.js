@@ -145,7 +145,7 @@ class Runner {
 		// Sort and get the best result
 		results.sort((a, b) => b.priority.total - a.priority.total);
 		const best = results[0];
-		this.addInfoToArchive(target, archiveConfig, best.info);
+		this.addInfoToArchive(target, archiveConfig, best.info, "add");
 	}
 
 	async updateMetadata(target, archiveConfig, fileName, type) {
@@ -175,7 +175,7 @@ class Runner {
 			throw new Error("Invalid result");
 		}
 
-		this.addInfoToArchive(target, archiveConfig, info);
+		this.addInfoToArchive(target, archiveConfig, info, "update");
 	}
 
 	getExistingMetadataFile(target, archiveConfig) {
@@ -224,27 +224,27 @@ class Runner {
 		return getFilteredImageList(images, archiveConfig.preferredImageOrder);
 	}
 
-	addInfoToArchive(target, archiveConfig, info) {
+	addInfoToArchive(target, archiveConfig, info, verb) {
 		const json = commonJson.toCommonJson(info);
 		const jsonString = JSON.stringify(json, null, "  ");
 		const infoJsonContent = Buffer.from(jsonString, "utf8");
 
 		let fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInArchiveFile), null);
-		const success = this.tryWriteInfoFile(target, null, fileName, infoJsonContent);
+		const success = this.tryWriteInfoFile(target, null, fileName, infoJsonContent, verb);
 
 		if (!success) {
 			fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInFolderOnFailure), null);
-			this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent);
+			this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent, verb);
 		}
 
 		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInFolder), null);
-		this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent);
+		this.tryWriteInfoFile(target, target.dirName, fileName, infoJsonContent, verb);
 
 		fileName = safeGet(() => target.getFileNameFormat(archiveConfig.metadataFileNameInParentFolder), null);
-		this.tryWriteInfoFile(target, path.dirname(target.dirName), fileName, infoJsonContent);
+		this.tryWriteInfoFile(target, path.dirname(target.dirName), fileName, infoJsonContent, verb);
 	}
 
-	tryWriteInfoFile(target, directory, fileName, content) {
+	tryWriteInfoFile(target, directory, fileName, content, verb) {
 		if (typeof(fileName) !== "string") { return true; }
 
 		let displayFileName;
@@ -255,8 +255,9 @@ class Runner {
 			displayFileName = path.relative(target.dirName, fileName);
 			extra = "";
 		} else {
+			const preposition = verb === "add" ? "to" : "in";
 			displayFileName = fileName;
-			extra = " to archive";
+			extra = ` ${preposition} archive`;
 		}
 
 		try {
@@ -266,11 +267,12 @@ class Runner {
 				util.writeBufferToFile(fileName, content);
 			}
 		} catch (e) {
-			this.log.error(`Failed to add metadata${extra}: ${displayFileName}`, e);
+			this.log.error(`Failed to ${verb} metadata${extra}: ${displayFileName}`, e);
 			return false;
 		}
 
-		this.log.successInfo(`Successfully added metadata${extra}: ${displayFileName}`);
+		const verbPast = verb + (verb[verb.length - 1] === "e" ? "d" : "ed");
+		this.log.successInfo(`Successfully ${verbPast} metadata${extra}: ${displayFileName}`);
 		return true;
 	}
 
