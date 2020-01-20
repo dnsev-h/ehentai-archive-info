@@ -39,8 +39,16 @@ class ArchiveFolder extends Archive {
 		return fileName !== null ? { fileName, type: "folder-parent" } : null;
 	}
 
-	readFile(fileName) {
-		return fs.readFileSync(path.resolve(this.fileName, fileName), { encoding: null });
+	readFile(fileName, type) {
+		switch (type) {
+			case "archive":
+				throw new Error("Not supported");
+			case "folder-parent":
+				return fs.readFileSync(path.resolve(path.dirname(this.fileName), fileName), { encoding: null });
+			case "folder":
+			default:
+				return fs.readFileSync(path.resolve(this.fileName, fileName), { encoding: null });
+		}
 	}
 
 	writeFile(fileName, content) {

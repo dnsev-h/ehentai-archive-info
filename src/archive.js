@@ -74,7 +74,7 @@ class Archive {
 		throw new Error("Not implemented");
 	}
 
-	readFile(fileName) {
+	readFile(fileName, type) {
 		throw new Error("Not implemented");
 	}
 
