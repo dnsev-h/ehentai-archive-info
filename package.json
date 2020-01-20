@@ -1,6 +1,6 @@
 {
 	"name": "e-hentai-archive-metadata",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"author": "dnsev-h",
 	"description": "Add metadata files to E*Hentai gallery archives",
 	"dependencies": {
