@@ -9,6 +9,7 @@ const ArchiveFile = require("./archive-file").ArchiveFile;
 const ArchiveFolder = require("./archive-folder").ArchiveFolder;
 const commonJson = require("./api/gallery-info/common-json");
 const lookup = require("./api/lookup");
+const GalleryIdentifier = require("./api/gallery-identifier").GalleryIdentifier;
 
 
 class Runner {
@@ -88,6 +89,18 @@ class Runner {
 			return;
 		}
 
+		if (archiveConfig.updateMetadataIfExists) {
+			const file = this.getExistingMetadataFile(target, archiveConfig);
+			if (file !== null) {
+				try {
+					await this.updateMetadata(target, archiveConfig, file.fileName, file.type)
+				} catch (e) {
+					this.log.error(`Error updating metadata: ${e}`);
+				}
+				return;
+			}
+		}
+
 		// Skip?
 		if (this.shouldSkipTarget(target, archiveConfig)) { return; }
 
@@ -133,6 +146,54 @@ class Runner {
 		results.sort((a, b) => b.priority.total - a.priority.total);
 		const best = results[0];
 		this.addInfoToArchive(target, archiveConfig, best.info);
+	}
+
+	async updateMetadata(target, archiveConfig, fileName, type) {
+		const source = target.readFile(fileName, type).toString("utf8");
+		const metadata = JSON.parse(source);
+
+		const {gid, token} = metadata.gallery_info.source;
+		if (typeof gid !== "number") {
+			throw new Error(`Invalid gallery ID: ${gid}`);
+		}
+		if (typeof token !== "string") {
+			throw new Error(`Invalid gallery token: ${token}`);
+		}
+
+		let results = [{
+			id: new GalleryIdentifier(gid, token),
+			count: 1
+		}];
+		results = await this.getSearchResultsInfo(results);
+
+		if (results.length === 0) {
+			throw new Error("No results");
+		}
+
+		const info = results[0].info;
+		if (info === null) {
+			throw new Error("Invalid result");
+		}
+
+		this.addInfoToArchive(target, archiveConfig, info);
+	}
+
+	getExistingMetadataFile(target, archiveConfig) {
+		const getFileArray = (file) => typeof file === "string" ? [ file ] : null;
+
+		let file = target.findExistingFileInArchive(getFileArray(archiveConfig.metadataFileNameInArchiveFile));
+		if (file !== null) { return file; }
+
+		file = target.findExistingFileInFolder(getFileArray(archiveConfig.metadataFileNameInFolder));
+		if (file !== null) { return file; }
+
+		file = target.findExistingFileInFolder(getFileArray(archiveConfig.metadataFileNameInFolderOnFailure));
+		if (file !== null) { return file; }
+
+		file = target.findExistingFileInParentFolder(getFileArray(archiveConfig.metadataFileNameInParentFolder));
+		if (file !== null) { return file; }
+
+		return null;
 	}
 
 	shouldSkipTarget(target, archiveConfig) {

@@ -162,6 +162,11 @@ adjusted depending on the needs.
       // Maximum number of errors allowed to be encountered before
       // aborting searches.
       "maxSearchErrors": 1,
+      // Updates the metadata JSON file if it already exists.
+      // This option will skip reverse lookups.
+      // Note that this option is currently not efficient with API calls
+      // and will currently only check a single archive at a time.
+      "updateMetadataIfExists": false,
       // Whether or not to continue to reverse search images if the
       // number of results are ambiguous.
       "continueSearchIfResultsAreAmbiguous": true,
@@ -195,6 +200,7 @@ adjusted depending on the needs.
       "minImagesToCheck": 1,
       "maxImagesToCheck": 5,
       "maxSearchErrors": 1,
+      "updateMetadataIfExists": false,
       "continueSearchIfResultsAreAmbiguous": true,
       "preferredImageOrder": [ 0, 1, 2, 9 ],
       "metadataFileNameInFolder": "info.json",
